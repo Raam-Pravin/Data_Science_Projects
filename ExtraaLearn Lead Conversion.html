@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 7.6.5.2 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.5in 11in; margin: 0.79in }
+		p { line-height: 115%; margin-bottom: 0.1in; background: transparent }
+		pre { background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-family: "Noto Sans Mono CJK SC", monospace; font-size: 10pt }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre class="western">import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+import seaborn as sns
+from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier
+
+
+#Data Overview
+df = pd.read_csv(&quot;C:\\Users\\Raamp\\Downloads\\ExtraaLearn.csv&quot;)
+print(df.head())
+df.info()
+
+#EDA
+age_visits_hist = sns.histplot(df['age'])
+plt.show()
+age_visits_box = sns.boxplot(x='age', data=df)
+plt.show()
+
+current_occupation_count = sns.countplot(x='current_occupation', data=df)
+plt.show()
+
+first_interaction_count = sns.countplot(x='first_interaction', data=df)
+plt.show()
+
+profile_completed_count = sns.countplot(x='profile_completed', data=df)
+plt.show()
+
+website_visits_hist = sns.histplot(df['website_visits'])
+plt.show()
+website_visits_box = sns.boxplot(x='website_visits', data=df)
+plt.show()
+
+time_spent_on_website_hist = sns.histplot(df['time_spent_on_website'])
+plt.show()
+time_spent_on_website_box = sns.boxplot(x='time_spent_on_website', data=df)
+plt.show()
+
+page_views_per_visit_hist = sns.histplot(df['page_views_per_visit'])
+plt.show()
+page_views_per_visit_box = sns.boxplot(x='page_views_per_visit', data=df)
+plt.show()
+
+last_activity_count = sns.countplot(x='last_activity', data=df)
+plt.show()
+
+print_media_type1_count = sns.countplot(x='print_media_type1', data=df)
+plt.show()
+
+print_media_type2_count = sns.countplot(x='print_media_type2', data=df)
+plt.show()
+
+digital_media_count = sns.countplot(x='digital_media', data=df)
+plt.show()
+
+educational_channels_count = sns.countplot(x='educational_channels', data=df)
+plt.show()
+
+referral_count = sns.countplot(x='referral', data=df)
+plt.show()
+
+status_count = sns.countplot(x='status', data=df)
+plt.show()
+
+
+
+#1
+sns.countplot(x='current_occupation', hue='status',data=df)
+plt.show()
+
+neg_status_df = df[df['status']==0]
+pos_status_df = df[df['status']==1]
+
+occupation_neg_status = neg_status_df.groupby('current_occupation')['status'].count()
+print(occupation_neg_status)
+occupation_pos_status = pos_status_df.groupby('current_occupation')['status'].count()
+print(occupation_pos_status)
+
+professional_pos_status_rate = (929/(929+1687))*100
+print(professional_pos_status_rate)
+student_pos_status_rate = (65/(65+490))*100
+print(student_pos_status_rate)
+unemployed_pos_status_rate = (383/(383+1058))*100
+print(unemployed_pos_status_rate)
+# Current occupation does affect lead status: 35.51% of professionals
+# converted to paid customers, 11.71% of students converted to paid
+# customers, and 26.58% of unemployed converted to paid customers
+
+
+#Question 2
+sns.countplot(x='first_interaction', hue='status',data=df)
+plt.show()
+
+interaction_neg_status = neg_status_df.groupby('first_interaction')['status'].count()
+print(interaction_neg_status)
+interaction_pos_status = pos_status_df.groupby('first_interaction')['status'].count()
+print(interaction_pos_status)
+
+website_pos_status_rate = (1159/(1159+1852))*100
+print(website_pos_status_rate)
+mobileapp_pos_status_rate = (218/(218+1383))*100
+print(mobileapp_pos_status_rate)
+#First Channels of Interaction do have an impact on lead status as 38.49% of
+# those whose first interaction was on the website converted to paid customer
+# and only 13.62% of those whose first interaction was on the mobile app
+# converted to paid customer
+
+#Question 3
+sns.countplot(x='last_activity', hue='status',data=df)
+plt.show()
+
+last_activity_neg_status = neg_status_df.groupby('last_activity')['status'].count()
+print(last_activity_neg_status)
+last_activity_pos_status = pos_status_df.groupby('last_activity')['status'].count()
+print(last_activity_pos_status)
+
+Email_pos_status_rate = (691/(1587+691))*100
+print(Email_pos_status_rate)
+Phone_pos_status_rate = (263/(971+263))*100
+print(Phone_pos_status_rate)
+Website_pos_status_rate = (423/(677+423))*100
+print(Website_pos_status_rate)
+
+# The method of last interaction that predicts converted paid customer
+# the best is website activity as 38.45% of leads whose last activity was
+# recorded as website activity converted to paid customers, compared to
+# 30.33% of leads whose last activity was recorded as email activity
+# converting to paid customers, and 21.31% of leads whose last activity was
+# recorded as phone activity converting to paid customers
+
+#Question 4
+print_media_type1_pos_status = pos_status_df.groupby('print_media_type1')['status'].count()
+print(print_media_type1_pos_status)
+print_media_type1_neg_status = neg_status_df.groupby('print_media_type1')['status'].count()
+print(print_media_type1_neg_status)
+print_media_type1_pos_status_rate = (159/(159+338))*100
+print(print_media_type1_pos_status_rate)
+
+print_media_type2_pos_status = pos_status_df.groupby('print_media_type2')['status'].count()
+print(print_media_type2_pos_status)
+print_media_type2_neg_status = neg_status_df.groupby('print_media_type2')['status'].count()
+print(print_media_type2_neg_status)
+print_media_type2_pos_status_rate = (75/(75+158))*100
+print(print_media_type2_pos_status_rate)
+
+digital_media_pos_status = pos_status_df.groupby('digital_media')['status'].count()
+print(digital_media_pos_status)
+digital_media_neg_status = neg_status_df.groupby('digital_media')['status'].count()
+print(digital_media_neg_status)
+digital_media_pos_status_rate = (168/(168+359))*100
+print(digital_media_pos_status_rate)
+
+education_channels_pos_status = pos_status_df.groupby('educational_channels')['status'].count()
+print(education_channels_pos_status)
+education_channels_neg_status = neg_status_df.groupby('educational_channels')['status'].count()
+print(education_channels_neg_status)
+education_channels_pos_status_rate = (197/(197+508))*100
+print(education_channels_pos_status_rate)
+
+referral_pos_status = pos_status_df.groupby('referral')['status'].count()
+print(referral_pos_status)
+referral_neg_status = neg_status_df.groupby('referral')['status'].count()
+print(referral_neg_status)
+referral_pos_status_rate = (63/(63+30))*100
+print(referral_pos_status_rate)
+
+# The channel which has the highest lead conversion rate is the referral
+# channel, 67.74% of leads who were referred converted to paid customers
+
+#Question 5
+profile_completed_pos_status = pos_status_df.groupby('profile_completed')['status'].count()
+print(profile_completed_pos_status)
+profile_completed_neg_status = neg_status_df.groupby('profile_completed')['status'].count()
+print(profile_completed_neg_status)
+high_profile_pos_status_rate = (946/(946+1318))*100
+print(high_profile_pos_status_rate)
+low_profile_pos_status_rate = (8/(8+99))*100
+print(low_profile_pos_status_rate)
+medium_profile_pos_status_rate = (423/(423+1818))*100
+print(medium_profile_pos_status_rate)
+
+# Having more details about a prospect does increase the chances of conversion
+# as 41.78% of prospects who had a high percentage of the profile completed
+# converted to paid customers, higher than 18.88% of prospects who had a
+# medium percentage of the profile completed converting to paid customers, and
+# the 7.48% of prospects who had a low percentage of the profile completed
+# converting to paid customers.
+
+#Data Pre-Processing
+#No missing values
+#No feature engineering needed
+#Recodeing
+profile_completed_recode = {'Low': 1, 'Medium': 2, 'High': 3}
+df['profile_completed'] = df['profile_completed'].replace(profile_completed_recode)
+
+yes_no_recode = {'Yes':1, 'No':0}
+df['print_media_type1'] = df['print_media_type1'].replace(yes_no_recode)
+df['print_media_type2'] = df['print_media_type2'].replace(yes_no_recode)
+df['digital_media'] = df['digital_media'].replace(yes_no_recode)
+df['educational_channels'] = df['educational_channels'].replace(yes_no_recode)
+df['referral'] = df['referral'].replace(yes_no_recode)
+
+current_occupation_recode = {'Unemployed': 1, 'Student': 2, 'Professional': 3}
+df['current_occupation'] = df['current_occupation'].replace(current_occupation_recode)
+
+first_interaction_recode = {'Website': 1, 'Mobile App': 2}
+df['first_interaction'] = df['first_interaction'].replace(first_interaction_recode)
+
+last_activity_recode = {'Website Activity': 1, 'Phone Activity': 2, 'Email Activity': 3}
+df['last_activity'] = df['last_activity'].replace(last_activity_recode)
+
+
+#Outlier Detection
+age_hist = sns.histplot(df['age'])
+plt.show()
+age_box = sns.boxplot(x='age', data=df)
+plt.show()
+
+website_visits_hist2 = sns.histplot(df['website_visits'])
+plt.show()
+website_visits_box2 = sns.boxplot(x='website_visits', data=df)
+plt.show()
+#identified outliers in website visits
+
+time_spent_on_website_hist2 = sns.histplot(df['time_spent_on_website'])
+plt.show()
+time_spent_on_website_box2 = sns.boxplot(x='time_spent_on_website', data=df)
+plt.show()
+
+page_views_per_visit_hist2 = sns.histplot(df['page_views_per_visit'])
+plt.show()
+page_views_per_visit_box2 = sns.boxplot(x='page_views_per_visit', data=df)
+plt.show()
+#identified outliers in page views
+
+#finding maximums to identify outliers
+print(df[['website_visits', 'page_views_per_visit']].describe())
+website_visits_max = 5 + (1.5*(3))
+print('website_visits_max:',website_visits_max)
+page_views_max = 3.756250 + (1.5*(3.756250-2.077750))
+print('page_views_max:',page_views_max)
+
+#Outlier Removal
+clean_df = df[(df['website_visits'] &lt;= 9.5) &amp; (df['page_views_per_visit'] &lt;= 6.274)]
+
+
+#EDA Post-Processing
+clean_age_visits_hist = sns.histplot(clean_df['age'])
+plt.show()
+clean_age_visits_box = sns.boxplot(x='age', data=clean_df)
+plt.show()
+
+clean_current_occupation_count = sns.countplot(x='current_occupation', data=clean_df)
+plt.show()
+
+clean_first_interaction_count = sns.countplot(x='first_interaction', data=clean_df)
+plt.show()
+
+clean_profile_completed_count = sns.countplot(x='profile_completed', data=clean_df)
+plt.show()
+
+clean_website_visits_hist = sns.histplot(clean_df['website_visits'])
+plt.show()
+clean_website_visits_box = sns.boxplot(x='website_visits', data=clean_df)
+plt.show()
+
+clean_time_spent_on_website_hist = sns.histplot(clean_df['time_spent_on_website'])
+plt.show()
+clean_time_spent_on_website_box = sns.boxplot(x='time_spent_on_website', data=clean_df)
+plt.show()
+
+clean_page_views_per_visit_hist = sns.histplot(clean_df['page_views_per_visit'])
+plt.show()
+clean_page_views_per_visit_box = sns.boxplot(x='page_views_per_visit', data=clean_df)
+plt.show()
+
+clean_last_activity_count = sns.countplot(x='last_activity', data=clean_df)
+plt.show()
+
+clean_print_media_type1_count = sns.countplot(x='print_media_type1', data=clean_df)
+plt.show()
+
+clean_print_media_type2_count = sns.countplot(x='print_media_type2', data=clean_df)
+plt.show()
+
+clean_digital_media_count = sns.countplot(x='digital_media', data=clean_df)
+plt.show()
+
+clean_educational_channels_count = sns.countplot(x='educational_channels', data=clean_df)
+plt.show()
+
+clean_referral_count = sns.countplot(x='referral', data=clean_df)
+plt.show()
+
+clean_status_count = sns.countplot(x='status', data=clean_df)
+plt.show()
+
+#Build Decision Tree Model
+x = clean_df.iloc[:, 1:14]
+y = clean_df.iloc[:, 14]
+y = y.to_frame()
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+def entropyfn(pos, neg):
+    log = np.log2
+    tot = pos + neg
+
+    pos = pos / tot
+    neg = neg / tot
+
+    if neg == 0:
+        return -pos * log(pos)
+
+    if pos == 0:
+        return -neg * log(neg)
+
+    return -pos * log(pos) - neg * log(neg)
+clf = tree.DecisionTreeClassifier(random_state = 0, criterion = 'entropy', max_depth = 3)
+clf = clf.fit(X_train, y_train)
+fig, ax = plt.subplots(figsize=(16, 6))
+out = tree.plot_tree(clf, filled=True, fontsize=10)
+for o in out:
+
+    arrow = o.arrow_patch
+
+    if arrow is not None:
+        arrow.set_edgecolor('red')
+
+        arrow.set_linewidth(3)
+plt.show()
+
+y_pred = clf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(&quot;Accuracy:&quot;, accuracy)
+#Accuracy high no need for pruning
+
+
+#Random Forest
+rf_clf = RandomForestClassifier(n_estimators=100, random_state=0)
+rf_clf.fit(X_train, y_train.values.ravel())
+
+#making predictions
+y_pred_rf = rf_clf.predict(X_test)
+
+#accuracy
+accuracy_rf = accuracy_score(y_test, y_pred_rf)
+print(&quot;Random Forest Accuracy:&quot;, accuracy_rf)
+
+#Accuracy high no need for pruning model
+
+#lead conversion can be predicted at a rate of 85.51% model performing
+# good, would like to explore the mistakes the model is making in future
+# and see if pattern can be found to make model more accurate</pre>
+</body>
+</html>
