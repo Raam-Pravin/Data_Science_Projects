@@ -125,8 +125,7 @@ print(unique_user_ids)
 unique_prod_ids = df_final['prod_id'].nunique()
 print(unique_prod_ids)
 
-#observation: 65,290 total rows in the data, 1,540 unique user IDs in data,
-# and 5,689 unique product IDs in the data
+#observation: 65,290 total rows in the data, 1,540 unique user IDs in data, and 5,689 unique product IDs in the data
 
 
 ## Top 10 users based on the number of ratings
@@ -164,7 +163,7 @@ final_rating = pd.DataFrame({'average_rating': average_rating,
 final_rating_sorted = final_rating.sort_values(by='average_rating', ascending=False)
 
 
-# See the first five records of the &quot;final_rating&quot; dataset
+# See the first five records of the dataset
 print(final_rating_sorted.head(5))
 
 # Defining a function to get the top n products based on the highest average rating and minimum interactions
@@ -250,12 +249,12 @@ def precision_recall_at_k(model, k=10, threshold=3.5):
         n_rel_and_rec_k = sum(((true_r &gt;= threshold) and (est &gt;= threshold))
                               for (est, true_r) in user_ratings[:k])
 
-        # Precision@K: Proportion of recommended items that are relevant
+        # Precision: Proportion of recommended items that are relevant
         # When n_rec_k is 0, Precision is undefined. Therefore, we are setting Precision to 0 when n_rec_k is 0
 
         precisions[uid] = n_rel_and_rec_k / n_rec_k if n_rec_k != 0 else 0
 
-        # Recall@K: Proportion of relevant items that are recommended
+        # Recall: Proportion of relevant items that are recommended
         # When n_rel is 0, Recall is undefined. Therefore, we are setting Recall to 0 when n_rel is 0
 
         recalls[uid] = n_rel_and_rec_k / n_rel if n_rel != 0 else 0
@@ -303,31 +302,18 @@ sim_user_user = KNNBasic(sim_options=sim_options, verbose=False, random_state=1)
 sim_user_user.fit(trainset)
 
 
-# Let us compute precision@k, recall@k,
-# and f_1 score using the precision_recall_at_k function defined above
+# Computing precision, recall, and f_1 score using the precision_recall_at_k function defined above
 precision_recall_at_k(sim_user_user)
-#Observation: F_1 score of 0.82 the harmonic mean of precision and recall shows that the
-# model is performing well
+	
+#Observation: F_1 score of 0.82 the harmonic mean of precision and recall shows that the model is performing well
 
 
-#Let's now predict rating for a user with `userId=A3LDPF5FMB782Z` and
-# `productId=1400501466` as shown below. Here the user has already interacted or
-# watched the product with productId '1400501466' and given a rating of 5
-
-# Predicting rating for a sample user with an interacted product
-sim_user_user.predict('A3LDPF5FMB782Z', 1400501466, r_ui=5, verbose=True)
-#observation: predicted rating is 4.29 while actual rating was 5
 
 #Below is the list of users who have not seen the product with product id &quot;1400501466&quot;.
 filtered_df = df[df['prod_id'] != &quot;1400501466&quot;]
 unique_user_ids = filtered_df['user_id'].unique()
 print(unique_user_ids)
 unique_user_ids_df = pd.DataFrame(unique_user_ids, columns=['User_ID'])
-
-#Below we are predicting rating for `userId=A34BZM6S9L7QI4` and `prod_id=1400501466`
-# Predicting rating for a sample user with a non interacted product
-sim_user_user.predict('A34BZM6S9L7QI4', 1400501466, verbose=True)
-#observation: predicted rating was 4.29
 
 
 
@@ -350,8 +336,7 @@ print(gs.best_score['rmse'])
 # Combination of parameters that gave the best RMSE score
 print(gs.best_params['rmse'])
 
-#Now, let's build the final model by using tuned values of the hyperparameters,
-# which we received by using grid search cross-validation.
+#Building the final model by using tuned values of the hyperparameters, from grid search cross-validation.
 
 
 # Using the optimal similarity measure for user-user based collaborative filtering
@@ -364,11 +349,11 @@ sim_user_user_optimized = KNNBasic(sim_options=sim_options, k=20, min_k=3,
 # Training the algorithm on the trainset
 sim_user_user_optimized.fit(trainset)
 
-# Let us compute precision@k and recall@k also with k =20
+# Computing precision and recall also with k =20
 precision_recall_at_k(sim_user_user_optimized)
 
-#observation: grid search revealed optimal hyperparameters which made model with
-# F_1 score of 0.815 harmonic mean of precision and recall, and okay model
+#observation: grid search revealed optimal hyperparameters which made model with 
+	F_1 score of 0.815 harmonic mean of precision and recall
 
 # Use sim_user_user_optimized model to recommend for userId &quot;A3LDPF5FMB782Z&quot; and
 # productId 1400501466
@@ -383,7 +368,7 @@ sim_user_user_optimized.predict('A34BZM6S9L7QI4',1400501466, verbose=True)
 
 #Identifying similar users to a given user (nearest neighbors)
 #We can also find out similar users to a given user or its nearest neighbors
-# based on this KNNBasic algorithm. Below, we are finding the 5 most similar users to
+# based on this KNNBasic algorithm. Below finding the 5 most similar users to
 # the first user in the list with internal id 0, based on the `msd` distance metric.
 
 # 0 is the inner id of the above user
@@ -399,11 +384,11 @@ def get_recommendations(data, user_id, top_n, algo):
     # Creating an user item interactions matrix
     user_item_interactions_matrix = data.pivot(index='user_id', columns='prod_id', values='rating')
 
-    # Extracting those product ids which the user_id has not interacted yet
+    # Extracting product ids which the user_id has not interacted with yet
     non_interacted_products = user_item_interactions_matrix.loc[user_id][
         user_item_interactions_matrix.loc[user_id].isnull()].index.tolist()
 
-    # Looping through each of the product ids which user_id has not interacted yet
+    # Looping through each of the product ids which user_id has not interacted with yet
     for item_id in non_interacted_products:
         # Predicting the ratings for those non interacted product ids by this user
         est = algo.predict(user_id, item_id).est
@@ -425,45 +410,31 @@ def get_recommendations(data, user_id, top_n, algo):
 recommendations = get_recommendations(df_final,'A3LDPF5FMB782Z', 5, sim_user_user)
 print(recommendations)
 
-# Building the dataframe for above recommendations with columns &quot;prod_id&quot; and
-# &quot;predicted_ratings&quot;
+# Building the dataframe for above recommendations with columns prod_id and predicted_ratings
 reccomend_df = pd.DataFrame(recommendations, columns=['prod_id', 'predicted_ratings'])
 
 
 
 #Item-Item Similarity-based Collaborative Filtering Recommendation System
 
-#Above we have seen similarity-based collaborative filtering where similarity is
-# calculated between users. Now let us look into similarity-based collaborative filtering
+#Above used similarity-based collaborative filtering where similarity is
+# calculated between users. Now using similarity-based collaborative filtering
 # where similarity is seen between items.
 
 # Declaring the similarity options
 sim_options = {'name': 'pearson',
                'user_based': False}
-# KNN algorithm is used to find desired similar items. Use random_state=1
+# K-Nearest neighbors algorithm is used to find desired similar items. Use random_state=1
 sim_item_item = KNNBasic(sim_options=sim_options, random_state=1, verbose=False)
 
-# Train the algorithm on the trainset, and predict ratings for the test set
+# Training algorithm on the trainset, and predicting ratings for the test set
 sim_item_item.fit(trainset)
 
-# Let us compute precision@k, recall@k, and f_1 score with k = 10
+# Computing precision, recall, and f_1 score with k = 10
 precision_recall_at_k(sim_item_item)
 #Observation: when grouping users by their similar rating habits to predict ratings
 # the F_1 score of the model which is the harmonic mean of precision and recall was 0.81
-# an okay performing model
 
-#Let's now predict a rating for a user with `userId = A3LDPF5FMB782Z` and
-# `prod_Id = 1400501466` as shown below. Here the user has already interacted or
-# watched the product with productId &quot;1400501466&quot;.
-
-# Predicting rating for a sample user with an interacted product
-sim_item_item.predict('A3LDPF5FMB782Z', 1400501466, r_ui=5, verbose=True)
-#observation: predicted rating was 4.29, actual rating was 5
-
-#Below we are predicting rating for the `userId = A34BZM6S9L7QI4` and
-# `prod_id = 1400501466`.
-sim_item_item.predict('A34BZM6S9L7QI4', 1400501466, verbose=True)
-#observation: predicted rating was 4.29, which is mean of all ratings
 
 #Hyperparameter tuning the item-item similarity-based model
 # Setting up parameter grid to tune the hyperparameters
@@ -477,20 +448,19 @@ param_grid = {'k': [10, 20, 30], 'min_k': [3, 6, 9],
 gs = GridSearchCV(KNNBasic, param_grid, measures=['rmse'], cv=3, n_jobs=-1)
 
 
-# Fitting the data
+# Fitting data
 gs.fit(data)
 
-# Find the best RMSE score
+# Finding best RMSE score
 print(gs.best_score['rmse'])
 
-# Find the combination of parameters that gave the best RMSE score
+# Finding combination of parameters that gives the best RMSE score
 print(gs.best_params['rmse'])
 
 
 
-#Use the best parameters from GridSearchCV to build the optimized item-item
-# similarity-based model. Compare the performance of the optimized model with the
-# baseline model.
+#Using best parameters from GridSearchCV to build optimized item-item similarity-based model. 
+	Comparing the performance of the optimized model with the baseline model.
 
 # Using the optimal similarity measure for item-item based collaborative filtering
 sim_options = {'name': 'pearson_baseline',
@@ -502,11 +472,10 @@ sim_item_item_optimized = KNNBasic(sim_options=sim_options, k=20, min_k=6, rando
 # Training the algorithm on the trainset
 sim_item_item_optimized.fit(trainset)
 
-# Let us compute precision@k and recall@k, f1_score and RMSE
+# Computing precision, recall, f1_score, and RMSE
 precision_recall_at_k(sim_item_item_optimized)
 #observation: After grid search and using optimal parameters item-item similarity
-#model had F-1 score of 0.815 showing predicting rating of item by using items similar
-# to item produces ok model
+#model had F-1 score of 0.815 showing predicting rating of item by using items similar to item 
 
 
 # Use sim_item_item_optimized model to recommend for userId &quot;A3LDPF5FMB782Z&quot; and
@@ -520,9 +489,8 @@ sim_item_item_optimized.predict('A34BZM6S9L7QI4', 1400501466, verbose=True)
 
 #Both models predicted same rating for item 4.29
 
-#We can also find out similar items to a given item or its nearest neighbors based on
-# this KNNBasic algorithm. Below we are finding the 5 most similar items to the item with
-# internal id 0 based on the msd distance metric.
+# Also possible to find similar items to a given item or its nearest neighbors based on the KNNBasic algorithm. 
+# Below finding the 5 most similar items to the item withinternal id 0 based on the msd distance metric.
 sim_item_item_optimized.get_neighbors(0, k=5)
 
 
@@ -532,8 +500,7 @@ sim_item_item_optimized.get_neighbors(0, k=5)
 recommendations = get_recommendations(df_final, 'A1A5KUIIIHFF4U', 5, sim_item_item)
 
 
-# Building the dataframe for above recommendations with columns &quot;prod_id&quot; and
-# &quot;predicted_ratings&quot;
+# Building the dataframe for above recommendations with columns prod_id and predicted_ratings
 recc_df = pd.DataFrame(recommendations, columns=['prod_id', 'predicted_ratings'])
 
 
@@ -543,32 +510,21 @@ recc_df = pd.DataFrame(recommendations, columns=['prod_id', 'predicted_ratings']
 # Singular Value Decomposition (SVD)
 
 
-# Using SVD matrix factorization. Use random_state = 1
+# Using SVD matrix factorization. Using random_state = 1
 svd = SVD(random_state=1)
 
-# Training the algorithm on the trainset
+# Training algorithm on the trainset
 svd.fit(trainset)
 
-# Use the function precision_recall_at_k to compute precision@k, recall@k, F1-Score,
-# and RMSE
+# Using precision_recall_at_k function to compute precision, recall, F1-Score, and RMSE
 precision_recall_at_k(svd)
 #singular value decomposition model has f-1 score of 0.827, mean of precision and recall
-# making it one of the best model at predicting rating so far
-
-#Let's now predict the rating for a user with `userId = &quot;A3LDPF5FMB782Z&quot;` and
-# `prod_id = &quot;1400501466`
-svd.predict('A3LDPF5FMB782Z', 1400501466, r_ui=5, verbose=True)
-#observation: predicted raing was 4.27 actual rating was 5
-
-#Below we are predicting rating for the `userId = &quot;A34BZM6S9L7QI4&quot;` and
-# `productId = &quot;1400501466&quot;
-svd.predict('A34BZM6S9L7QI4', 1400501466, verbose=True)
-#observation: predicted raing was 4.54
+# making it best model at predicting rating so far
 
 
 
 #Improving Matrix Factorization based recommendation system by tuning its hyperparameters
-# Set the parameter space to tune
+# Setting parameter space to tune
 param_grid = {'n_epochs': [10, 20, 30], 'lr_all': [0.001, 0.005, 0.01],
               'reg_all': [0.2, 0.4, 0.6]}
 # Performing 3-fold gridsearch cross-validation
@@ -587,41 +543,27 @@ print(gs_.best_params['rmse'])
 
 
 
-#Now, we will the build final model by using tuned values of the hyperparameters,
-# which we received using grid search cross-validation above.
+#Building final model using tuned values of the hyperparameters
 
-# Build the optimized SVD model using optimal hyperparameter search. Use random_state=1
+# Building optimized SVD model using optimal hyperparameter search. Using random_state=1
 svd_optimized = SVD(n_epochs=30, lr_all=0.01, reg_all=0.2, random_state=1)
 
-# Train the algorithm on the trainset
+# Training algorithm 
 svd_optimized=svd_optimized.fit(trainset)
 
-# Use the function precision_recall_at_k to compute precision@k, recall@k, F1-Score,
-# and RMSE
+# Using precision_recall_at_k function to compute precision, recall, F1-Score, and RMSE
 precision_recall_at_k(svd_optimized)
 #observation: using optimized hyperparameters from grid search f-1 score, mean of precision
 # and recall was 0.827 one of the best models at predicting rating so far
 
-# Use svd_algo_optimized model to recommend for userId &quot;A3LDPF5FMB782Z&quot; and
-# productId &quot;1400501466&quot;
-svd_optimized.predict('A3LDPF5FMB782Z', 1400501466, r_ui=2, verbose=True)
-
-
-
-# Use svd_algo_optimized model to recommend for userId &quot;A34BZM6S9L7QI4&quot; and
-# productId &quot;1400501466&quot;
-svd_optimized.predict('A34BZM6S9L7QI4', 1400501466, verbose=True)
 
 
 #Conclusion and Reccomendations:
 #Overall SVD models worked better than using k-nearest algorithm to group users to predict
 # rating or group items to predict rating. Both methods of grouping made very similar
 # models which performed almost the same. The dataset is heavily imbalanced as more than
-#half the ratings are 5, this is probably what is causing all models to consistently predict
-# ratings greater than 4 and similar to the overall mean of all ratings. To better train
-#the models in the future I would want to create a dataset through bootstrapping or
-#synthetically made dataset where minority classes of ratings are oversampled through
-# simple random replacement. I believe this would make the models more efficient when
-# they are trained on such a dataset.</pre>
+#half the ratings are 5. To better train the models in the future creating a dataset through bootstrapping 
+# where minority classes of ratings are oversampled through simple random replacement. 
+</pre>
 </body>
 </html>
