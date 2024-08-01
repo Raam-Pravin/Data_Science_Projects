@@ -29,8 +29,8 @@ for user in users:
     # Otherwise, set their rating count to 1
     else:
         ratings_count[user] = 1
-# %%
-# We want our users to have at least 50 ratings to be considered
+
+# Only users to have at least 50 ratings to be considered
 RATINGS_CUTOFF = 50
 
 remove_users = []
@@ -40,24 +40,24 @@ for user, num_ratings in ratings_count.items():
         remove_users.append(user)
 
 df = df.loc[~ df.user_id.isin(remove_users)]
-# %%
+
 # Get the column containing the products
 prods = df.prod_id
 
-# Create a dictionary from products to their number of ratings
+# Creating dictionary from products to their number of ratings
 ratings_count = dict()
 
 for prod in prods:
 
-    # If we already have the product, just add 1 to its rating count
+    # If already have the product, add 1 to its rating count
     if prod in ratings_count:
         ratings_count[prod] += 1
 
-    # Otherwise, set their rating count to 1
+    # Otherwise, setting rating count to 1
     else:
         ratings_count[prod] = 1
     # %%
-# We want our item to have at least 5 ratings to be considered
+# Only items that have at least 5 ratings to be considered
 RATINGS_CUTOFF = 5
 
 remove_users = []
@@ -68,16 +68,16 @@ for user, num_ratings in ratings_count.items():
 
 df_final = df.loc[~ df.prod_id.isin(remove_users)]
 # %%
-# Print a few rows of the imported dataset
+# Printing few rows of the imported dataset
 df_final.head()
 
 
 #Exploratory Data Analysis
-#Check the number of rows and columns and provide observations
+#Checking number of rows and columns and providing observations
 print(df_final)
 #observation: 65,290 rows and 3 columns
 
-# Check Data types and provide observations
+# Checking Data types and providing observations
 print(df_final.info())
 #observation: three columns user_id column is object data type, product_id column is
 # object data type, and rating column is float64 data type
@@ -255,10 +255,10 @@ def precision_recall_at_k(model, k=10, threshold=3.5):
 
     print('F_1 score: ', round((2 * precision * recall) / (precision + recall), 3))  # Formula to compute the F-1 score
 
-#Below we are loading the `rating` dataset,
+#Below loading the `rating` dataset,
 # which is a pandas DataFrame, into a different format called
 # `surprise.dataset.DatasetAutoFolds`, which is required by this library.
-# To do this, we will be using the classes `Reader` and `Dataset`.
+# To do this, using the classes `Reader` and `Dataset`.
 
 # Instantiating Reader scale with expected rating scale
 reader = Reader(rating_scale=(1, 5))
@@ -337,19 +337,19 @@ precision_recall_at_k(sim_user_user_optimized)
 #observation: grid search revealed optimal hyperparameters which made model with 
 	F_1 score of 0.815 harmonic mean of precision and recall
 
-# Use sim_user_user_optimized model to recommend for userId &quot;A3LDPF5FMB782Z&quot; and
+# Use sim_user_user_optimized model to recommend for userId A3LDPF5FMB782Z and
 # productId 1400501466
 sim_user_user_optimized.predict('A3LDPF5FMB782Z', 1400501466, r_ui=5, verbose=True)
 
-# Use sim_user_user_optimized model to recommend for userId &quot;A34BZM6S9L7QI4&quot; and
-# productId &quot;1400501466&quot;
+# Use sim_user_user_optimized model to recommend for userId A34BZM6S9L7QI4 and
+# productId 1400501466
 sim_user_user_optimized.predict('A34BZM6S9L7QI4',1400501466, verbose=True)
 
 #Observation: Both Models predicted 4.29 rating for both, which is the overall mean rating
 
 
 #Identifying similar users to a given user (nearest neighbors)
-#We can also find out similar users to a given user or its nearest neighbors
+#Can also find out similar users to a given user or its nearest neighbors
 # based on this KNNBasic algorithm. Below finding the 5 most similar users to
 # the first user in the list with internal id 0, based on the `msd` distance metric.
 
@@ -460,13 +460,13 @@ precision_recall_at_k(sim_item_item_optimized)
 #model had F-1 score of 0.815 showing predicting rating of item by using items similar to item 
 
 
-# Use sim_item_item_optimized model to recommend for userId &quot;A3LDPF5FMB782Z&quot; and
-# productId &quot;1400501466&quot;
+# Use sim_item_item_optimized model to recommend for userId A3LDPF5FMB782Z and
+# productId 1400501466
 sim_item_item_optimized.predict('A3LDPF5FMB782Z', 1400501466, r_ui=5, verbose=True)
 
 
-#Use sim_item_item_optimized model to recommend for userId &quot;A34BZM6S9L7QI4&quot; and
-# productId &quot;1400501466&quot;
+#Use sim_item_item_optimized model to recommend for userId A34BZM6S9L7QI4 and
+# productId 1400501466
 sim_item_item_optimized.predict('A34BZM6S9L7QI4', 1400501466, verbose=True)
 
 #Both models predicted same rating for item 4.29
