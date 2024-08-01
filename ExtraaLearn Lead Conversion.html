@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 
 #Data Overview
-df = pd.read_csv(&quot;C:\\Users\\Raamp\\Downloads\\ExtraaLearn.csv&quot;)
+df = pd.read_csv("C:\\Users\\Raamp\\Downloads\\ExtraaLearn.csv")
 print(df.head())
 df.info()
 
@@ -67,7 +67,7 @@ plt.show()
 
 
 
-#1
+# Visualizing affect of occupation on lead status
 sns.countplot(x='current_occupation', hue='status',data=df)
 plt.show()
 
@@ -90,7 +90,8 @@ print(unemployed_pos_status_rate)
 # customers, and 26.58% of unemployed converted to paid customers
 
 
-#Question 2
+
+# Investigating whether first channels of interaction have an impact on the lead status
 sns.countplot(x='first_interaction', hue='status',data=df)
 plt.show()
 
@@ -108,7 +109,9 @@ print(mobileapp_pos_status_rate)
 # and only 13.62% of those whose first interaction was on the mobile app
 # converted to paid customer
 
-#Question 3
+
+
+# Investigating what mode of interactions works the best on prospects
 sns.countplot(x='last_activity', hue='status',data=df)
 plt.show()
 
@@ -131,7 +134,9 @@ print(Website_pos_status_rate)
 # converting to paid customers, and 21.31% of leads whose last activity was
 # recorded as phone activity converting to paid customers
 
-#Question 4
+
+
+# Investigating which mode of leads has the highest lead conversion rate
 print_media_type1_pos_status = pos_status_df.groupby('print_media_type1')['status'].count()
 print(print_media_type1_pos_status)
 print_media_type1_neg_status = neg_status_df.groupby('print_media_type1')['status'].count()
@@ -170,7 +175,9 @@ print(referral_pos_status_rate)
 # The channel which has the highest lead conversion rate is the referral
 # channel, 67.74% of leads who were referred converted to paid customers
 
-#Question 5
+
+
+# Investigating whether having more details about a prosepect increases the chance of conversion
 profile_completed_pos_status = pos_status_df.groupby('profile_completed')['status'].count()
 print(profile_completed_pos_status)
 profile_completed_neg_status = neg_status_df.groupby('profile_completed')['status'].count()
@@ -298,7 +305,9 @@ plt.show()
 clean_status_count = sns.countplot(x='status', data=clean_df)
 plt.show()
 
-#Build Decision Tree Model
+
+
+#Building Decision Tree Model
 x = clean_df.iloc[:, 1:14]
 y = clean_df.iloc[:, 14]
 y = y.to_frame()
@@ -334,7 +343,7 @@ plt.show()
 
 y_pred = clf.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
-print(&quot;Accuracy:&quot;, accuracy)
+print("Accuracy:", accuracy)
 #Accuracy high no need for pruning
 
 
@@ -347,10 +356,7 @@ y_pred_rf = rf_clf.predict(X_test)
 
 #accuracy
 accuracy_rf = accuracy_score(y_test, y_pred_rf)
-print(&quot;Random Forest Accuracy:&quot;, accuracy_rf)
+print("Random Forest Accuracy:", accuracy_rf)
 
-#Accuracy high no need for pruning model
 
-#lead conversion can be predicted at a rate of 85.51% model performing
-# good, would like to explore the mistakes the model is making in future
-# and see if pattern can be found to make model more accurate
+# Lead conversion can be predicted at a rate of 85.51% 
